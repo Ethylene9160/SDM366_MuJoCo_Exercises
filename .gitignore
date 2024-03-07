@@ -1,0 +1,9 @@
+# local files
+local/
+
+# ppt, doc, pdf files
+*.ppt
+*.pptx
+*.pdf
+*.doc
+*.docx 
