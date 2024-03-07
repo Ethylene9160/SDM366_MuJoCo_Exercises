@@ -6,4 +6,12 @@ local/
 *.pptx
 *.pdf
 *.doc
-*.docx 
+*.docx
+
+# zipped files
+*.zip
+*.7z
+*.rar
+
+# specialized file
+readme_deu.md
