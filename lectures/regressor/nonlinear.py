@@ -4,7 +4,6 @@ import torch
 import mujoco
 import numpy as np
 from numpy.random import random
-from scipy.optimize import minimize
 
 # import plt
 import matplotlib.pyplot as plt
@@ -19,76 +18,54 @@ from scipy import optimize
 # This is an implemtation of a simple question in ppt //todo page
 
 # generate b and truePos
-b = np.mat([[1, -2, -4, 5, -7, 8], [3, -2, 3, 6, 5.5, 10]])
-truePos = np.transpose(np.mat([4, 0]))
+# b: 2x6 matrix, each column is a measurement
 
-plt.plot(b[0, :], b[1, :], 'ro')
-plt.plot(truePos[0], truePos[1], 'bo')
-plt.show()
-# print("pipupipu chapachapachapa")
 
-def cost233(theta, b, y):
-    '''
 
-    :param theta:
-    :param b:
-    :param y:
-    :return:
-    '''
-    j = 0
-    # m = np.size(b, 1)
-    m = b.shape[1]
-    for i in range(m):
-        # axis = 0 -> column vector;
-        # axis = 1 -> row vector
-        j += np.square(y[i] - np.linalg.norm(theta - b[:, i], axis=0))
-    print("j: ", j)
-    return j[0]
-
-def cost(theta, b, y):
-    m = b.shape[1]
+def _distance(x, y):
     res = 0
-    for i in range(m):
-        res += np.square(y[i] - np.linalg.norm(theta - b[:, i]))
-    print("res: ", res)
-    return res
+    for i in range(len(x)):
+        res += (x[i] - y[i]) ** 2
+    return np.sqrt(res)
+
 
 def cost(theta, b, y):
+    '''
+    A function of cost. That is: J(theta) = sum(y - ||theta - b||^2)
+    :param theta: the estimated position
+    :param b: the measurement data
+    :param y: the true position
+    :return: the cost
+    '''
+    j = 0.0
+    m = b.shape[1]
+    for i in range(m):
+        j += (y[i] - _distance(theta, b[:, i]))**2
+    # print("j: ", j)
+    return j
+
+# def cost(theta, b, y):
+#     m = b.shape[1]
+#     res = 0
+#     for i in range(m):
+#         res += np.square(y[i] - np.linalg.norm(theta - b[:, i]))
+#     print("res: ", res)
+#     return res
+
+# Deprecated.
+def cost2(theta, b, y):
     m = b.shape[1] # Get the number of columns
+    # np.linalg.norm calculate the L2 norm of a vector (计算向量的L2范数，也就是欧几里得距离)
+    # ie. np.linalg.norm([1, 2, 3]) = sqrt(1^2 + 2^2 + 3^2)
+    # theta[:, None] - b
+    # i.e. theta = [1,2,3] => theta[:, None] = [[1], [2], [3]], or => [[1,1],[2,2],[3,3]], or .etc.
+    # and '-b' means that,
+    # thus, i.e. theta = [0,0], b = [[1,2,3], [4,5,6]]
+    # => theta[:, None] - b =[[0,0,0], [0,0,0]] - [[1,2,3], [4,5,6]] = [[-1,-2,-3], [-4,-5,-6]]
     res = np.sum(np.square(y - np.linalg.norm(theta[:, None] - b, axis=0)))
     print("res: ", res)
     return res
 
 
 
-# generate mesuarment data
-m = np.size(b, 1)
 
-# generate noise
-noise = 0.1 * random(m)
-y = np.zeros(m)
-
-for i in range(m):
-    y[i] = np.linalg.norm(truePos - b[:, i], axis=0) + noise[i]
-
-# init theta
-# init theta
-theta0 = np.array([0, 0])
-
-# least squares to get the result
-thetahat_LS = np.linalg.lstsq(b.T, y, rcond=None)[0]
-
-print("Estimated position (Least Squares): ", thetahat_LS)
-
-# optimize the result
-res = minimize(cost, thetahat_LS, args=(b, y), method='BFGS')
-
-# use theta_LS to calculate the result
-
-# plot the result
-plt.plot(b[0, :], b[1, :], 'ro')
-plt.plot(truePos[0], truePos[1], 'bo')
-# plt.plot(thetahat_LS[0], thetahat_LS[1], 'go')
-plt.title('Estimated position')
-plt.plot(res.x[0], res.x[1], 'yo')
-plt.show()
