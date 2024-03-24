@@ -8,3 +8,22 @@ Course exercises, with mujoco as environment.
 
 Config `conda` rather than just python environment ples.
 
+
+
+# File Structures
+
+```bash
+├─lectures
+│  ├─introduction
+│  └─regressor
+├─README.md
+└─readme_zh.md
+```
+
+* intruduction
+
+fail to imitate.
+
+* regressor
+
+The course on 24/3/224, Prof. Zhang provide a sample code, and here is a highly imitative one.
